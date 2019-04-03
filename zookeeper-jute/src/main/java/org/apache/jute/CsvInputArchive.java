@@ -25,7 +25,7 @@ import java.io.PushbackReader;
 import java.io.UnsupportedEncodingException;
 
 /**
- *
+ *方便数据可视化的展现 
  */
 class CsvInputArchive implements InputArchive {
     

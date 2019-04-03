@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.TreeMap;
 
 /**
- *
+ *对数据对象的序列化和反序列化，主要用于网络传输和本地磁盘存储，是底层最重要序列化器
  */
 public class BinaryOutputArchive implements OutputArchive {
     private ByteBuffer bb = ByteBuffer.allocate(1024);

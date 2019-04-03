@@ -24,7 +24,7 @@ import java.io.IOException;
 
 /**
  * Interface that is implemented by generated classes.
- * 
+ * JUTE最根本的序列化定义接口
  */
 @InterfaceAudience.Public
 public interface Record {

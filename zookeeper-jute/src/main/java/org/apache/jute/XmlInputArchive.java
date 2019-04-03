@@ -30,7 +30,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 /**
- *
+ *将数据以xml形式保存和读取  暂时没有用到
  */
 class XmlInputArchive implements InputArchive {
     
