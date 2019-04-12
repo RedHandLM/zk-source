@@ -118,12 +118,9 @@ public class ClientRequestTimeoutTest extends QuorumPeerTestBase {
 
     class CustomClientCnxn extends ClientCnxn {
 
-        public CustomClientCnxn(String chrootPath, HostProvider hostProvider,
-                int sessionTimeout, ZooKeeper zooKeeper,
-                ClientWatchManager watcher, ClientCnxnSocket clientCnxnSocket,
-                boolean canBeReadOnly) throws IOException {
-            super(chrootPath, hostProvider, sessionTimeout, zooKeeper, watcher,
-                    clientCnxnSocket, canBeReadOnly);
+        public CustomClientCnxn(String chrootPath, HostProvider hostProvider,int sessionTimeout, ZooKeeper zooKeeper,
+                ClientWatchManager watcher, ClientCnxnSocket clientCnxnSocket,boolean canBeReadOnly) throws IOException {
+            super(chrootPath, hostProvider, sessionTimeout, zooKeeper, watcher,clientCnxnSocket, canBeReadOnly);
         }
 
         @Override
@@ -144,14 +141,9 @@ public class ClientRequestTimeoutTest extends QuorumPeerTestBase {
         }
 
         @Override
-        protected ClientCnxn createConnection(String chrootPath,
-                HostProvider hostProvider, int sessionTimeout,
-                ZooKeeper zooKeeper, ClientWatchManager watcher,
-                ClientCnxnSocket clientCnxnSocket, boolean canBeReadOnly)
-                        throws IOException {
-            return new CustomClientCnxn(chrootPath, hostProvider,
-                    sessionTimeout, zooKeeper, watcher, clientCnxnSocket,
-                    canBeReadOnly);
+        protected ClientCnxn createConnection(String chrootPath,HostProvider hostProvider, int sessionTimeout,ZooKeeper zooKeeper, ClientWatchManager watcher,
+                ClientCnxnSocket clientCnxnSocket, boolean canBeReadOnly)throws IOException {
+            return new CustomClientCnxn(chrootPath, hostProvider,sessionTimeout, zooKeeper, watcher, clientCnxnSocket,canBeReadOnly);
         }
     }
 }

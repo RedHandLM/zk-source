@@ -131,11 +131,13 @@ public class ClientCnxn {
 
     /**
      * These are the packets that have been sent and are waiting for a response.
+     * 核心队列  等待服务器packet响应
      */
     private final LinkedList<Packet> pendingQueue = new LinkedList<Packet>();
 
     /**
      * These are the packets that need to be sent.
+     * 核心队列  发送packet到服务器的队列
      */
     private final LinkedBlockingDeque<Packet> outgoingQueue = new LinkedBlockingDeque<Packet>();
 
@@ -210,6 +212,8 @@ public class ClientCnxn {
     /**
      * If any request's response in not received in configured requestTimeout
      * then it is assumed that the response packet is lost.
+     * 任何请求的响应在设定的请求超时事件外，就认定这个响应丢失
+     *
      */
     private long requestTimeout;
 
@@ -251,7 +255,16 @@ public class ClientCnxn {
      * 最小传输单元，服务端和客户端传输数据使用，都要包装成Packet进行处理
      */
 
-
+    /**
+     * 内部类的意义
+     *  1：静态内部类可以达到封装的目的
+     *  2：静态内部类可以解决多继承的问题
+     *  3：静态内部类可以访问外部类的静态成员变量 非静态内部类可以访问外部类的所有方法和属性
+     *  4: 通过内部类对象引用来操作外部类的私有属性和方法（称为闭包）
+     *
+     *  Packet是zookeeper的最基本传输单位，所有客户端和服务端的交互都是通过packet来进行的，
+     *
+     */
     static class Packet {
         RequestHeader requestHeader;
 
@@ -366,10 +379,8 @@ public class ClientCnxn {
      * @throws IOException
      */
     public ClientCnxn(String chrootPath, HostProvider hostProvider, int sessionTimeout, ZooKeeper zooKeeper,
-            ClientWatchManager watcher, ClientCnxnSocket clientCnxnSocket, boolean canBeReadOnly)
-            throws IOException {
-        this(chrootPath, hostProvider, sessionTimeout, zooKeeper, watcher,
-             clientCnxnSocket, 0, new byte[16], canBeReadOnly);
+            ClientWatchManager watcher, ClientCnxnSocket clientCnxnSocket, boolean canBeReadOnly)throws IOException {
+        this(chrootPath, hostProvider, sessionTimeout, zooKeeper, watcher,clientCnxnSocket, 0, new byte[16], canBeReadOnly);
     }
 
     /**

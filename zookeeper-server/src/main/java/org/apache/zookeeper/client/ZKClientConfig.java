@@ -21,6 +21,7 @@ package org.apache.zookeeper.client;
 import java.io.File;
 
 import org.apache.yetus.audience.InterfaceAudience;
+import org.apache.zookeeper.ClientCnxn;
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.common.ZKConfig;
 import org.apache.zookeeper.server.quorum.QuorumPeerConfig.ConfigException;
@@ -83,8 +84,7 @@ public class ZKClientConfig extends ZKConfig {
      * java system property
      */
     private void initFromJavaSystemProperties() {
-        setProperty(ZOOKEEPER_REQUEST_TIMEOUT,
-                System.getProperty(ZOOKEEPER_REQUEST_TIMEOUT));
+        setProperty(ZOOKEEPER_REQUEST_TIMEOUT,System.getProperty(ZOOKEEPER_REQUEST_TIMEOUT));
     }
 
     @Override

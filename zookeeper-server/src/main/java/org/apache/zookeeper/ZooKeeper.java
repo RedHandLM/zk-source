@@ -864,25 +864,24 @@ public class ZooKeeper implements AutoCloseable {
      * @throws IllegalArgumentException
      *             if an invalid chroot path is specified
      */
-    public ZooKeeper(String connectString, int sessionTimeout, Watcher watcher,
-            boolean canBeReadOnly, HostProvider aHostProvider,
+    public ZooKeeper(String connectString, int sessionTimeout, Watcher watcher,boolean canBeReadOnly, HostProvider aHostProvider,
             ZKClientConfig clientConfig) throws IOException {
-        LOG.info("Initiating client connection, connectString=" + connectString
-                + " sessionTimeout=" + sessionTimeout + " watcher=" + watcher);
+        LOG.info("Initiating client connection, connectString=" + connectString+ " sessionTimeout=" + sessionTimeout + " watcher=" + watcher);
 
         if (clientConfig == null) {
             clientConfig = new ZKClientConfig();
         }
         this.clientConfig = clientConfig;
+        //创建默认的客户端defaultWatchManager
         watchManager = defaultWatchManager();
+        //设置默认watcher
         watchManager.defaultWatcher = watcher;
-        ConnectStringParser connectStringParser = new ConnectStringParser(
-                connectString);
+        //解析服务器地址
+        ConnectStringParser connectStringParser = new ConnectStringParser(connectString);
+        //服务器地址管理器
         hostProvider = aHostProvider;
-
-        cnxn = createConnection(connectStringParser.getChrootPath(),
-                hostProvider, sessionTimeout, this, watchManager,
-                getClientCnxnSocket(), canBeReadOnly);
+        //初始化ClientCnxn 网络管理器
+        cnxn = createConnection(connectStringParser.getChrootPath(),hostProvider, sessionTimeout, this, watchManager,getClientCnxnSocket(), canBeReadOnly);
         cnxn.start();
     }
 
