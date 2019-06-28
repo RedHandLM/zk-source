@@ -1,19 +1,16 @@
 /**
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional information regarding
+ * copyright ownership. The ASF licenses this file to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License. You may obtain a
+ * copy of the License at
  * <p/>
  * http://www.apache.org/licenses/LICENSE-2.0
  * <p/>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package org.apache.zookeeper.server;
@@ -53,16 +50,14 @@ public class ContainerManager {
      * @param maxPerMinute the max containers to delete per second - avoids
      *                     herding of container deletions
      */
-    public ContainerManager(ZKDatabase zkDb, RequestProcessor requestProcessor,
-                            int checkIntervalMs, int maxPerMinute) {
+    public ContainerManager(ZKDatabase zkDb, RequestProcessor requestProcessor, int checkIntervalMs, int maxPerMinute) {
         this.zkDb = zkDb;
         this.requestProcessor = requestProcessor;
         this.checkIntervalMs = checkIntervalMs;
         this.maxPerMinute = maxPerMinute;
         timer = new Timer("ContainerManagerTask", true);
 
-        LOG.info(String.format("Using checkIntervalMs=%d maxPerMinute=%d",
-                checkIntervalMs, maxPerMinute));
+        LOG.info(String.format("Using checkIntervalMs=%d maxPerMinute=%d", checkIntervalMs, maxPerMinute));
     }
 
     /**
@@ -80,14 +75,13 @@ public class ContainerManager {
                         Thread.currentThread().interrupt();
                         LOG.info("interrupted");
                         cancel();
-                    } catch ( Throwable e ) {
+                    } catch (Throwable e) {
                         LOG.error("Error checking containers", e);
                     }
                 }
             };
             if (task.compareAndSet(null, timerTask)) {
-                timer.scheduleAtFixedRate(timerTask, checkIntervalMs,
-                        checkIntervalMs);
+                timer.scheduleAtFixedRate(timerTask, checkIntervalMs, checkIntervalMs);
             }
         }
     }
@@ -106,22 +100,18 @@ public class ContainerManager {
     /**
      * Manually check the containers. Not normally used directly
      */
-    public void checkContainers()
-            throws InterruptedException {
+    public void checkContainers() throws InterruptedException {
         long minIntervalMs = getMinIntervalMs();
         for (String containerPath : getCandidates()) {
             long startMs = Time.currentElapsedTime();
 
             ByteBuffer path = ByteBuffer.wrap(containerPath.getBytes());
-            Request request = new Request(null, 0, 0,
-                    ZooDefs.OpCode.deleteContainer, path, null);
+            Request request = new Request(null, 0, 0, ZooDefs.OpCode.deleteContainer, path, null);
             try {
-                LOG.info("Attempting to delete candidate container: {}",
-                        containerPath);
+                LOG.info("Attempting to delete candidate container: {}", containerPath);
                 requestProcessor.processRequest(request);
             } catch (Exception e) {
-                LOG.error("Could not delete container: {}",
-                        containerPath, e);
+                LOG.error("Could not delete container: {}", containerPath, e);
             }
 
             long elapsedMs = Time.currentElapsedTime() - startMs;
@@ -143,13 +133,11 @@ public class ContainerManager {
         for (String containerPath : zkDb.getDataTree().getContainers()) {
             DataNode node = zkDb.getDataTree().getNode(containerPath);
             /*
-                cversion > 0: keep newly created containers from being deleted
-                before any children have been added. If you were to create the
-                container just before a container cleaning period the container
-                would be immediately be deleted.
+             * cversion > 0: keep newly created containers from being deleted before any children have been
+             * added. If you were to create the container just before a container cleaning period the container
+             * would be immediately be deleted.
              */
-            if ((node != null) && (node.stat.getCversion() > 0) &&
-                    (node.getChildren().isEmpty())) {
+            if ((node != null) && (node.stat.getCversion() > 0) && (node.getChildren().isEmpty())) {
                 candidates.add(containerPath);
             }
         }
@@ -158,7 +146,7 @@ public class ContainerManager {
             if (node != null) {
                 Set<String> children = node.getChildren();
                 if (children.isEmpty()) {
-                    if ( EphemeralType.get(node.stat.getEphemeralOwner()) == EphemeralType.TTL ) {
+                    if (EphemeralType.get(node.stat.getEphemeralOwner()) == EphemeralType.TTL) {
                         long elapsed = getElapsed(node);
                         long ttl = EphemeralType.TTL.getValue(node.stat.getEphemeralOwner());
                         if ((ttl != 0) && (getElapsed(node) > ttl)) {

@@ -14,6 +14,11 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ *
+ *
+ * zookeeper 服务器地址解析器
+ *
  */
 
 package org.apache.zookeeper.client;
@@ -41,8 +46,10 @@ import static org.apache.zookeeper.common.StringUtils.split;
 public final class ConnectStringParser {
     private static final int DEFAULT_PORT = 2181;
 
+    //命名空间，相对地址，假如设置为/app ，那么客户端在创建节点/lock时，那么创建的绝对地址会是：/app/lock，相对路径是/lock
     private final String chrootPath;
 
+    //保存服务器地址
     private final ArrayList<InetSocketAddress> serverAddresses = new ArrayList<InetSocketAddress>();
 
     /**

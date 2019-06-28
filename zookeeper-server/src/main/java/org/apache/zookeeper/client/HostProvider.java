@@ -14,6 +14,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * 定义了一个客户端 服务器地址管理接口
  */
 
 package org.apache.zookeeper.client;
@@ -36,6 +38,12 @@ import java.util.Collection;
  * A HostProvider must return resolved InetSocketAddress instances on next() if the next address is resolvable.
  * In that case, it's up to the HostProvider, whether it returns the next resolvable address in the list or return
  * the next one as UnResolved.
+ *
+ * zookeeper 接口三要素
+ * 1:实现HostProvider next方法必须放返回一个合法的地址，不能返回null，
+ * 2:要返回一个解析过的InetSocketAddress,
+ * 3:size不能返回0，
+ *
  * 
  * Different HostProvider could be imagined:
  * 
@@ -59,7 +67,7 @@ public interface HostProvider {
 
     /**
      * Notify the HostProvider of a successful connection.
-     * 
+     * 客户端连接服务器成功通过这个方法通知hostProvider，hostProvider会通过这个通知去重置内部状态
      * The HostProvider may use this notification to reset it's inner state.
      */
     public void onConnected();

@@ -1,19 +1,16 @@
 /**
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional information regarding
+ * copyright ownership. The ASF licenses this file to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License. You may obtain a
+ * copy of the License at
  * <p/>
  * http://www.apache.org/licenses/LICENSE-2.0
  * <p/>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package org.apache.zookeeper.server;
@@ -81,7 +78,7 @@ public enum EphemeralType {
     TTL() {
         @Override
         public long maxValue() {
-            return EXTENDED_FEATURE_VALUE_MASK;  // 12725 days, about 34 years
+            return EXTENDED_FEATURE_VALUE_MASK; // 12725 days, about 34 years
         }
 
         @Override
@@ -89,8 +86,9 @@ public enum EphemeralType {
             if ((ttl > TTL.maxValue()) || (ttl <= 0)) {
                 throw new IllegalArgumentException("ttl must be positive and cannot be larger than: " + TTL.maxValue());
             }
-            //noinspection PointlessBitwiseExpression
-            return EXTENDED_MASK | EXTENDED_BIT_TTL | ttl;  // TTL_RESERVED_BIT is actually zero - but it serves to document that the proper extended bit needs to be set
+            // noinspection PointlessBitwiseExpression
+            return EXTENDED_MASK | EXTENDED_BIT_TTL | ttl; // TTL_RESERVED_BIT is actually zero - but it serves to
+                                                           // document that the proper extended bit needs to be set
         }
 
         @Override
@@ -127,7 +125,7 @@ public enum EphemeralType {
     }
 
     public static final long CONTAINER_EPHEMERAL_OWNER = Long.MIN_VALUE;
-    public static final long MAX_EXTENDED_SERVER_ID = 0xfe;  // 254
+    public static final long MAX_EXTENDED_SERVER_ID = 0xfe; // 254
 
     private static final long EXTENDED_MASK = 0xff00000000000000L;
     private static final long EXTENDED_BIT_TTL = 0x0000;
@@ -176,7 +174,8 @@ public enum EphemeralType {
                 long extendedFeatureBit = getExtendedFeatureBit(ephemeralOwner);
                 EphemeralType ephemeralType = extendedFeatureMap.get(extendedFeatureBit);
                 if (ephemeralType == null) {
-                    throw new IllegalArgumentException(String.format("Invalid ephemeralOwner. [%s]", Long.toHexString(ephemeralOwner)));
+                    throw new IllegalArgumentException(
+                            String.format("Invalid ephemeralOwner. [%s]", Long.toHexString(ephemeralOwner)));
                 }
                 return ephemeralType;
             }
@@ -194,12 +193,15 @@ public enum EphemeralType {
      * @throws RuntimeException extendedTypesEnabled is true but Server ID is too large
      */
     public static void validateServerId(long serverId) {
-        // TODO: in the future, serverId should be validated for all cases, not just the extendedEphemeralTypesEnabled case
+        // TODO: in the future, serverId should be validated for all cases, not just the
+        // extendedEphemeralTypesEnabled case
         // TODO: however, for now, it would be too disruptive
 
         if (extendedEphemeralTypesEnabled()) {
             if (serverId > EphemeralType.MAX_EXTENDED_SERVER_ID) {
-                throw new RuntimeException("extendedTypesEnabled is true but Server ID is too large. Cannot be larger than " + EphemeralType.MAX_EXTENDED_SERVER_ID);
+                throw new RuntimeException(
+                        "extendedTypesEnabled is true but Server ID is too large. Cannot be larger than "
+                                + EphemeralType.MAX_EXTENDED_SERVER_ID);
             }
         }
     }
@@ -211,8 +213,7 @@ public enum EphemeralType {
      * @param ttl  ttl
      * @throws IllegalArgumentException if the ttl is not valid for the mode
      */
-    @SuppressFBWarnings(value = "RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT",
-            justification = "toEphemeralOwner may throw IllegalArgumentException")
+    @SuppressFBWarnings(value = "RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT", justification = "toEphemeralOwner may throw IllegalArgumentException")
     public static void validateTTL(CreateMode mode, long ttl) {
         if (mode.isTTL()) {
             TTL.toEphemeralOwner(ttl);
