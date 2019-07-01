@@ -37,6 +37,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
+/**
+ * 服务端和客户端连接的管理工厂
+ */
 public abstract class ServerCnxnFactory {
 
     public static final String ZOOKEEPER_SERVER_CNXN_FACTORY = "zookeeper.serverCnxnFactory";
@@ -125,7 +128,8 @@ public abstract class ServerCnxnFactory {
 
     // This method is to maintain compatiblity of startup(zks) and enable sharing of zks
     // when we add secureCnxnFactory.
-    public abstract void startup(ZooKeeperServer zkServer, boolean startServer) throws IOException, InterruptedException;
+    public abstract void startup(ZooKeeperServer zkServer, boolean startServer)
+            throws IOException, InterruptedException;
 
     /** The maximum queue length of the ZooKeeper server's socket */
     public abstract int getSocketListenBacklog();
@@ -157,7 +161,8 @@ public abstract class ServerCnxnFactory {
             serverCnxnFactoryName = NIOServerCnxnFactory.class.getName();
         }
         try {
-            ServerCnxnFactory serverCnxnFactory = (ServerCnxnFactory) Class.forName(serverCnxnFactoryName).getDeclaredConstructor().newInstance();
+            ServerCnxnFactory serverCnxnFactory =
+                    (ServerCnxnFactory) Class.forName(serverCnxnFactoryName).getDeclaredConstructor().newInstance();
             LOG.info("Using {} as server connection factory", serverCnxnFactoryName);
             return serverCnxnFactory;
         } catch (Exception e) {
@@ -179,7 +184,8 @@ public abstract class ServerCnxnFactory {
         return createFactory(addr, maxClientCnxns, -1);
     }
 
-    static public ServerCnxnFactory createFactory(InetSocketAddress addr, int maxClientCnxns, int backlog) throws IOException {
+    static public ServerCnxnFactory createFactory(InetSocketAddress addr, int maxClientCnxns, int backlog)
+            throws IOException {
         ServerCnxnFactory factory = createFactory();
         factory.configure(addr, maxClientCnxns, backlog);
         return factory;
@@ -191,7 +197,8 @@ public abstract class ServerCnxnFactory {
 
     public abstract Iterable<Map<String, Object>> getAllConnectionInfo(boolean brief);
 
-    private final ConcurrentHashMap<ServerCnxn, ConnectionBean> connectionBeans = new ConcurrentHashMap<ServerCnxn, ConnectionBean>();
+    private final ConcurrentHashMap<ServerCnxn, ConnectionBean> connectionBeans =
+            new ConcurrentHashMap<ServerCnxn, ConnectionBean>();
 
     // Connection set is relied on heavily by four letter commands
     // Construct a ConcurrentHashSet using a ConcurrentHashMap
@@ -228,7 +235,8 @@ public abstract class ServerCnxnFactory {
      * @throws IOException if jaas.conf is missing or there's an error in it.
      */
     protected void configureSaslLogin() throws IOException {
-        String serverSection = System.getProperty(ZooKeeperSaslServer.LOGIN_CONTEXT_NAME_KEY, ZooKeeperSaslServer.DEFAULT_LOGIN_CONTEXT_NAME);
+        String serverSection = System.getProperty(ZooKeeperSaslServer.LOGIN_CONTEXT_NAME_KEY,
+                ZooKeeperSaslServer.DEFAULT_LOGIN_CONTEXT_NAME);
 
         // Note that 'Configuration' here refers to javax.security.auth.login.Configuration.
         AppConfigurationEntry entries[] = null;
@@ -267,7 +275,8 @@ public abstract class ServerCnxnFactory {
             login = new Login(serverSection, saslServerCallbackHandler, new ZKConfig());
             login.startThreadIfNeeded();
         } catch (LoginException e) {
-            throw new IOException("Could not configure server because SASL configuration did not allow the " + " ZooKeeper server to authenticate itself properly: " + e);
+            throw new IOException("Could not configure server because SASL configuration did not allow the "
+                    + " ZooKeeper server to authenticate itself properly: " + e);
         }
     }
 }

@@ -1,19 +1,16 @@
 /**
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional information regarding
+ * copyright ownership. The ASF licenses this file to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License. You may obtain a
+ * copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package org.apache.zookeeper.server;
@@ -107,29 +104,27 @@ public abstract class ServerCnxn implements Stats, Watcher {
 
     public abstract void close();
 
-    public abstract void sendResponse(ReplyHeader h, Record r,
-            String tag, String cacheKey, Stat stat) throws IOException;
+    public abstract void sendResponse(ReplyHeader h, Record r, String tag, String cacheKey, Stat stat)
+            throws IOException;
 
     public void sendResponse(ReplyHeader h, Record r, String tag) throws IOException {
         sendResponse(h, r, tag, null, null);
     }
 
     protected byte[] serializeRecord(Record record) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(
-            ZooKeeperServer.intBufferStartingSizeBytes);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream(ZooKeeperServer.intBufferStartingSizeBytes);
         BinaryOutputArchive bos = BinaryOutputArchive.getArchive(baos);
         bos.writeRecord(record, null);
         return baos.toByteArray();
     }
 
-    protected ByteBuffer[] serialize(ReplyHeader h, Record r, String tag,
-            String cacheKey, Stat stat) throws IOException {
+    protected ByteBuffer[] serialize(ReplyHeader h, Record r, String tag, String cacheKey, Stat stat)
+            throws IOException {
         byte[] header = serializeRecord(h);
         byte[] data = null;
         if (r != null) {
             ResponseCache cache = zkServer.getReadResponseCache();
-            if (cache != null && stat != null && cacheKey != null &&
-                    !cacheKey.endsWith(Quotas.statNode)) {
+            if (cache != null && stat != null && cacheKey != null && !cacheKey.endsWith(Quotas.statNode)) {
                 // Use cache to get serialized data.
                 //
                 // NB: Tag is ignored both during cache lookup and serialization,
@@ -198,7 +193,7 @@ public abstract class ServerCnxn implements Stats, Watcher {
     }
 
     abstract void disableRecv(boolean waitDisableRecv);
-    
+
     abstract void setSessionTimeout(int sessionTimeout);
 
     protected ZooKeeperSaslServer zooKeeperSaslServer = null;
@@ -289,9 +284,7 @@ public abstract class ServerCnxn implements Stats, Watcher {
         return packetsSent.incrementAndGet();
     }
 
-    protected synchronized void updateStatsForResponse(long cxid, long zxid,
-            String op, long start, long end)
-    {
+    protected synchronized void updateStatsForResponse(long cxid, long zxid, String op, long start, long end) {
         // don't overwrite with "special" xids - we're interested
         // in the clients last real operation
         if (cxid >= 0) {
@@ -313,7 +306,7 @@ public abstract class ServerCnxn implements Stats, Watcher {
     }
 
     public Date getEstablished() {
-        return (Date)established.clone();
+        return (Date) established.clone();
     }
 
     public long getOutstandingRequests() {
@@ -376,9 +369,13 @@ public abstract class ServerCnxn implements Stats, Watcher {
     }
 
     public abstract InetSocketAddress getRemoteSocketAddress();
+
     public abstract int getInterestOps();
+
     public abstract boolean isSecure();
+
     public abstract Certificate[] getClientCertificateChain();
+
     public abstract void setClientCertificateChain(Certificate[] chain);
 
     /**
@@ -386,8 +383,7 @@ public abstract class ServerCnxn implements Stats, Watcher {
      * @param brief iff true prints brief details, otw full detail
      * @return information about this connection
      */
-    public synchronized void
-    dumpConnectionInfo(PrintWriter pwriter, boolean brief) {
+    public synchronized void dumpConnectionInfo(PrintWriter pwriter, boolean brief) {
         pwriter.print(" ");
         pwriter.print(getRemoteSocketAddress());
         pwriter.print("[");

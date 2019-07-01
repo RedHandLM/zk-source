@@ -38,15 +38,23 @@ import org.slf4j.LoggerFactory;
  * interval. It always rounds up the tick interval to provide a sort of grace
  * period. Sessions are thus expired in batches made up of sessions that expire
  * in a given interval.
+ *
+ * 服务端的会话管理
  */
 public class SessionTrackerImpl extends ZooKeeperCriticalThread implements SessionTracker {
     private static final Logger LOG = LoggerFactory.getLogger(SessionTrackerImpl.class);
 
+    //会话ID -  会话实体
     protected final ConcurrentHashMap<Long, SessionImpl> sessionsById = new ConcurrentHashMap<>();
 
+
+    //zookeeper 的分桶管理会话超时
     private final ExpiryQueue<SessionImpl> sessionExpiryQueue;
 
+    //会话超时时间
     private final ConcurrentMap<Long, Integer> sessionsWithTimeout;
+
+    //下一个sessionId
     private final AtomicLong nextSessionId = new AtomicLong();
 
     public static class SessionImpl implements Session {
@@ -81,7 +89,7 @@ public class SessionTrackerImpl extends ZooKeeperCriticalThread implements Sessi
 
     public static void main(String[] args) {
         System.out.println(System.currentTimeMillis());
-        //1561643147439
+        // 1561643147439
     }
 
 
@@ -92,7 +100,7 @@ public class SessionTrackerImpl extends ZooKeeperCriticalThread implements Sessi
      *
      * 生成最初的sessionId
      *  高位字节为serverId，后面5*5个字节是时间戳，低两个字节是0
-
+    
      为什么是左移24位？  为什么是右移动8位？
         举例子：
             时间戳：       1561643147439
@@ -100,29 +108,31 @@ public class SessionTrackerImpl extends ZooKeeperCriticalThread implements Sessi
             左移24:        0110101110011001001011110110000010101111000000000000000000000000
             右移8:         0000000001101011100110010010111101100000101011110000000000000000
         通过两次移动，变成了一个正数，避免了负数的情况，高位8个0下面会用来参与serverId的运算
-
-
+    
+    
      为什么左移56位？
             ID假如为2:     0000000000000000000000000000000000000000000000000000000000000010
             ID左移56：     0000001000000000000000000000000000000000000000000000000000000000
         通过左移56位得到一个高位不为0的数字
-
-
+    
+    
      为什么进行 | 运算？
         时间左移8之后的数字： 0000000001101011100110010010111101100000101011110000000000000000
                 ID左移56： 0000001000000000000000000000000000000000000000000000000000000000
                 | 运算 ：  0000001001101011100110010010111101100000101011110000000000000000
-
+    
      最终SessionId结果： 174401439348490240
      有符号右移和无符号右移
      *
+     *
+     * 3.4.6版本修复了无符号右移8位  ===>> 有符号右移
      */
     public static long initializeNextSession(long id) {
         long nextSid;
         nextSid = (Time.currentElapsedTime() << 24) >>> 8;
         nextSid = nextSid | (id << 56);
         if (nextSid == EphemeralType.CONTAINER_EPHEMERAL_OWNER) {
-            //边界情况，虽然不太可能，但还是检查下
+            // 边界情况，虽然不太可能，但还是检查下
             ++nextSid; // this is an unlikely edge case, but check it just in case
         }
         return nextSid;

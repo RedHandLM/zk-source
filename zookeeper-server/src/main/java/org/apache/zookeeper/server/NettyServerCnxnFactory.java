@@ -233,7 +233,8 @@ public class NettyServerCnxnFactory extends ServerCnxnFactory {
 
                     String authProviderProp = System.getProperty(x509Util.getSslAuthProviderProperty(), "x509");
 
-                    X509AuthenticationProvider authProvider = (X509AuthenticationProvider) ProviderRegistry.getProvider(authProviderProp);
+                    X509AuthenticationProvider authProvider =
+                            (X509AuthenticationProvider) ProviderRegistry.getProvider(authProviderProp);
 
                     if (authProvider == null) {
                         LOG.error("Auth provider not found: {}", authProviderProp);
@@ -263,7 +264,8 @@ public class NettyServerCnxnFactory extends ServerCnxnFactory {
     private ServerBootstrap configureBootstrapAllocator(ServerBootstrap bootstrap) {
         ByteBufAllocator testAllocator = TEST_ALLOCATOR.get();
         if (testAllocator != null) {
-            return bootstrap.option(ChannelOption.ALLOCATOR, testAllocator).childOption(ChannelOption.ALLOCATOR, testAllocator);
+            return bootstrap.option(ChannelOption.ALLOCATOR, testAllocator).childOption(ChannelOption.ALLOCATOR,
+                    testAllocator);
         } else {
             return bootstrap;
         }
@@ -272,41 +274,48 @@ public class NettyServerCnxnFactory extends ServerCnxnFactory {
     NettyServerCnxnFactory() {
         x509Util = new ClientX509Util();
 
-        EventLoopGroup bossGroup = NettyUtils.newNioOrEpollEventLoopGroup(NettyUtils.getClientReachableLocalInetAddressCount());
+        EventLoopGroup bossGroup =
+                NettyUtils.newNioOrEpollEventLoopGroup(NettyUtils.getClientReachableLocalInetAddressCount());
         EventLoopGroup workerGroup = NettyUtils.newNioOrEpollEventLoopGroup();
-        ServerBootstrap bootstrap = new ServerBootstrap().group(bossGroup, workerGroup).channel(NettyUtils.nioOrEpollServerSocketChannel())
-                // parent channel options
-                .option(ChannelOption.SO_REUSEADDR, true)
-                // child channels options
-                .childOption(ChannelOption.TCP_NODELAY, true).childOption(ChannelOption.SO_LINGER, -1).childHandler(new ChannelInitializer<SocketChannel>() {
-                    @Override
-                    protected void initChannel(SocketChannel ch) throws Exception {
-                        ChannelPipeline pipeline = ch.pipeline();
-                        if (secure) {
-                            initSSL(pipeline);
-                        }
-                        pipeline.addLast("servercnxnfactory", channelHandler);
-                    }
-                });
+        ServerBootstrap bootstrap =
+                new ServerBootstrap().group(bossGroup, workerGroup).channel(NettyUtils.nioOrEpollServerSocketChannel())
+                        // parent channel options
+                        .option(ChannelOption.SO_REUSEADDR, true)
+                        // child channels options
+                        .childOption(ChannelOption.TCP_NODELAY, true).childOption(ChannelOption.SO_LINGER, -1)
+                        .childHandler(new ChannelInitializer<SocketChannel>() {
+                            @Override
+                            protected void initChannel(SocketChannel ch) throws Exception {
+                                ChannelPipeline pipeline = ch.pipeline();
+                                if (secure) {
+                                    initSSL(pipeline);
+                                }
+                                pipeline.addLast("servercnxnfactory", channelHandler);
+                            }
+                        });
         this.bootstrap = configureBootstrapAllocator(bootstrap);
         this.bootstrap.validate();
     }
 
-    private synchronized void initSSL(ChannelPipeline p) throws X509Exception, KeyManagementException, NoSuchAlgorithmException {
+    private synchronized void initSSL(ChannelPipeline p)
+            throws X509Exception, KeyManagementException, NoSuchAlgorithmException {
         String authProviderProp = System.getProperty(x509Util.getSslAuthProviderProperty());
         SSLContext sslContext;
         if (authProviderProp == null) {
             sslContext = x509Util.getDefaultSSLContext();
         } else {
             sslContext = SSLContext.getInstance("TLSv1");
-            X509AuthenticationProvider authProvider = (X509AuthenticationProvider) ProviderRegistry.getProvider(System.getProperty(x509Util.getSslAuthProviderProperty(), "x509"));
+            X509AuthenticationProvider authProvider = (X509AuthenticationProvider) ProviderRegistry
+                    .getProvider(System.getProperty(x509Util.getSslAuthProviderProperty(), "x509"));
 
             if (authProvider == null) {
                 LOG.error("Auth provider not found: {}", authProviderProp);
-                throw new SSLContextException("Could not create SSLContext with specified auth provider: " + authProviderProp);
+                throw new SSLContextException(
+                        "Could not create SSLContext with specified auth provider: " + authProviderProp);
             }
 
-            sslContext.init(new X509KeyManager[] {authProvider.getKeyManager()}, new X509TrustManager[] {authProvider.getTrustManager()}, null);
+            sslContext.init(new X509KeyManager[] {authProvider.getKeyManager()},
+                    new X509TrustManager[] {authProvider.getTrustManager()}, null);
         }
 
         SSLEngine sslEngine = sslContext.createSSLEngine();
